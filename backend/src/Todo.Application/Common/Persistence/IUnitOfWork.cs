@@ -1,8 +1,6 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace Todo.Application.Common.Persistence;
 
-public interface IUnitOfWork<TDb> where TDb : DbContext
+public interface IUnitOfWork<TDb>
 {
     bool IsTransactionOpen { get; }
     void BeginTransaction(System.Data.IsolationLevel isolationLevel);
@@ -13,4 +11,3 @@ public interface IUnitOfWork<TDb> where TDb : DbContext
     Task RollbackAsync();
     Task SaveChangesAsync();
 }
-

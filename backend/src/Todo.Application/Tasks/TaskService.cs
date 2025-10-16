@@ -18,7 +18,7 @@ public class TaskService : ITaskService
         => _repo.GetAllForListAsync(ct);
 
     public Task<TaskItem?> GetByIdAsync(int id, CancellationToken ct = default)
-        => _repo.GetByIdAsync(id, ct);
+        => _repo.FindByIdAsync(id);
 
     public async Task<TaskItem> CreateAsync(CreateTaskRequest request, CancellationToken ct = default)
     {
@@ -43,7 +43,7 @@ public class TaskService : ITaskService
 
     public async Task<TaskItem?> ToggleCompleteAsync(int id, CancellationToken ct = default)
     {
-        var item = await _repo.GetByIdAsync(id, ct);
+        var item = await _repo.FindByIdAsync(id);
         if (item is null) return null;
         item.IsDone = !item.IsDone;
         await _repo.UpdateAsync(item, ct);
@@ -52,10 +52,9 @@ public class TaskService : ITaskService
 
     public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
     {
-        var item = await _repo.GetByIdAsync(id, ct);
+        var item = await _repo.FindByIdAsync(id);
         if (item is null) return false;
         await _repo.DeleteAsync(item, ct);
         return true;
     }
 }
-
