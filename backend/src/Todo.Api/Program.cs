@@ -5,6 +5,7 @@ using Todo.Infrastructure.Data;
 using Todo.Infrastructure.Repositories;
 using Todo.Application.Common.Persistence;
 using Todo.Infrastructure.Persistence;
+using Todo.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskRequestValidator>
 
 // Repositories & Services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork<TodoDbContext>>();
+builder.Services.AddScoped(typeof(IUnitOfWork<>), typeof(UnitOfWork<>));
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 

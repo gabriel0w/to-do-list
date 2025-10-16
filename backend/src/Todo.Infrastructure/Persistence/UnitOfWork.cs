@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore;
 using Todo.Application.Common.Persistence;
 
 namespace Todo.Infrastructure.Persistence;
@@ -8,6 +9,7 @@ public class UnitOfWork<TDb> : IUnitOfWork where TDb : DbContext
 {
     private readonly TDb _dbContext;
     private IDbContextTransaction? _transaction;
+    private bool _readOnly;
 
     public UnitOfWork(TDb dbContext)
     {
@@ -15,6 +17,15 @@ public class UnitOfWork<TDb> : IUnitOfWork where TDb : DbContext
     }
 
     public bool IsTransactionOpen => _transaction is not null;
+
+    public bool HasChanges() => _dbContext.ChangeTracker.HasChanges();
+
+    public void SetReadOnly()
+    {
+        _readOnly = true;
+        _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+        _dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+    }
 
     public void BeginTransaction(System.Data.IsolationLevel isolationLevel)
     {
@@ -28,7 +39,10 @@ public class UnitOfWork<TDb> : IUnitOfWork where TDb : DbContext
 
     public void Commit()
     {
-        _dbContext.SaveChanges();
+        if (!_readOnly)
+        {
+            _dbContext.SaveChanges();
+        }
         _transaction?.Commit();
         _transaction?.Dispose();
         _transaction = null;
@@ -36,7 +50,10 @@ public class UnitOfWork<TDb> : IUnitOfWork where TDb : DbContext
 
     public async Task CommitAsync()
     {
-        await _dbContext.SaveChangesAsync();
+        if (!_readOnly)
+        {
+            await _dbContext.SaveChangesAsync();
+        }
         if (_transaction is not null)
         {
             await _transaction.CommitAsync();
