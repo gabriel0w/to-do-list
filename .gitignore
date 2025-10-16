@@ -27,7 +27,6 @@ packages/
 
 # EF Core
 # (Migrations devem ser commitadas; apenas caches locais)
-**/Migrations/*Designer.cs
 
 # Node / Angular
 frontend/node_modules/
