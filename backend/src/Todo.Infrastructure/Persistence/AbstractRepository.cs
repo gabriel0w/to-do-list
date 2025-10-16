@@ -37,21 +37,18 @@ public abstract class AbstractRepository<TDb, TEntity, TId> : IRepository<TEntit
     public virtual TEntity Save(TEntity entity)
     {
         DbSet.Add(entity);
-        _dbContext.SaveChanges();
         return entity;
     }
 
     public virtual async Task<TEntity> SaveAsync(TEntity entity)
     {
         await DbSet.AddAsync(entity);
-        await _dbContext.SaveChangesAsync();
         return entity;
     }
 
     public virtual IEnumerable<TEntity> Save(IEnumerable<TEntity> entities)
     {
         DbSet.AddRange(entities);
-        _dbContext.SaveChanges();
         return entities;
     }
 
@@ -101,4 +98,3 @@ public abstract class AbstractRepository<TDb, TEntity, TId> : IRepository<TEntit
 
     public Task SaveChangesAsync() => _unitOfWork.SaveChangesAsync();
 }
-

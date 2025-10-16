@@ -5,6 +5,7 @@ using Todo.Infrastructure.Data;
 using Todo.Infrastructure.Repositories;
 using Todo.Application.Common.Persistence;
 using Todo.Infrastructure.Persistence;
+using Todo.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Per-request Unit of Work
+app.UseMiddleware<UnitOfWorkMiddleware>();
 
 app.UseAuthorization();
 
