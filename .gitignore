@@ -1,0 +1,50 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs / Editors
+.vscode/
+.idea/
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+logs/
+
+# Dotnet build
+**/bin/
+**/obj/
+**/TestResult*/
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+
+# EF Core
+# (Migrations devem ser commitadas; apenas caches locais)
+**/Migrations/*Designer.cs
+
+# Node / Angular
+frontend/node_modules/
+**/node_modules/
+**/dist/
+.angular/cache/
+coverage/
+
+# Playwright
+playwright-report/
+test-results/
+.playwright/
+
+# Env files
+.env
+.env.*
+
+# Docker
+**/.docker/*
+
