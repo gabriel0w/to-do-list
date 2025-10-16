@@ -31,18 +31,19 @@ public class TaskRepository : AbstractRepository<TodoDbContext, TaskItem, int>, 
     public async Task<TaskItem> AddAsync(TaskItem item, CancellationToken ct = default)
     {
         await DbSet.AddAsync(item, ct);
+        await _unitOfWork.SaveChangesAsync();
         return item;
     }
 
     public async Task UpdateAsync(TaskItem item, CancellationToken ct = default)
     {
         DbSet.Update(item);
-        await Task.CompletedTask;
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(TaskItem item, CancellationToken ct = default)
     {
         DbSet.Remove(item);
-        await Task.CompletedTask;
+        await _unitOfWork.SaveChangesAsync();
     }
 }
