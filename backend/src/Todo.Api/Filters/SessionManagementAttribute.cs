@@ -1,6 +1,7 @@
 using System.Data;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Todo.Infrastructure.Persistence;
+using Todo.Application.Abstractions.Persistence;
 
 namespace Todo.Api.Filters;
 
@@ -29,7 +30,7 @@ public class SessionManagementAttribute : ActionFilterAttribute
     public override void OnActionExecuting(ActionExecutingContext context)
     {
         var uowType = typeof(IUnitOfWork<>).MakeGenericType(_contextType);
-        var uow = (context.HttpContext.RequestServices.GetService(uowType) as Application.Common.Persistence.IUnitOfWork)!;
+        var uow = (context.HttpContext.RequestServices.GetService(uowType) as IUnitOfWork)!;
 
         if (_sessionStrategy == SessionStrategy.ReadOnly)
             uow.SetReadOnly();
@@ -45,7 +46,7 @@ public class SessionManagementAttribute : ActionFilterAttribute
     public override void OnActionExecuted(ActionExecutedContext context)
     {
         var uowType = typeof(IUnitOfWork<>).MakeGenericType(_contextType);
-        var uow = (Application.Common.Persistence.IUnitOfWork)context.HttpContext.RequestServices.GetService(uowType)!;
+        var uow = (IUnitOfWork)context.HttpContext.RequestServices.GetService(uowType)!;
         if (!uow.IsTransactionOpen)
             return;
 
@@ -71,4 +72,3 @@ public class SessionManagementAttribute : ActionFilterAttribute
         }
     }
 }
-

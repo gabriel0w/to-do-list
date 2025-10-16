@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using Todo.Application.Common.Persistence;
+using Todo.Application.Abstractions.Persistence;
 using Todo.Domain.Common;
 
 namespace Todo.Infrastructure.Persistence;

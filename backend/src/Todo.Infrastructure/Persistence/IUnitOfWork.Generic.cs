@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Todo.Application.Common.Persistence;
+using Todo.Application.Abstractions.Persistence;
 
 namespace Todo.Infrastructure.Persistence;
 
 public interface IUnitOfWork<TDb> : IUnitOfWork where TDb : DbContext
 {
 }
-

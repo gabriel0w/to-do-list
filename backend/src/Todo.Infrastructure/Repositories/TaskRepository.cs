@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Todo.Application.Common.Persistence;
-using Todo.Application.Tasks;
+using Todo.Application.Abstractions.Persistence;
+using Todo.Application.Features.Tasks.Interfaces;
 using Todo.Domain.Entities;
-using Todo.Infrastructure.Data;
+using Todo.Infrastructure.Persistence.Db;
 using Todo.Infrastructure.Persistence;
 
 namespace Todo.Infrastructure.Repositories;

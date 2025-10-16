@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
-using Todo.Application.Tasks;
-using Todo.Infrastructure.Data;
+using Todo.Application.Features.Tasks.Interfaces;
+using Todo.Application.Features.Tasks.Validators;
+using Todo.Application.Features.Tasks.Services;
+using Todo.Infrastructure.Persistence.Db;
 using Todo.Infrastructure.Repositories;
-using Todo.Application.Common.Persistence;
+using Todo.Application.Abstractions.Persistence;
 using Todo.Infrastructure.Persistence;
-using Todo.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

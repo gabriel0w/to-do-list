@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using Todo.Api.Filters;
-using Todo.Application.Tasks;
+using Todo.Application.Features.Tasks.Contracts;
+using Todo.Application.Features.Tasks.Interfaces;
 using Todo.Domain.Entities;
 
 namespace Todo.Api.Controllers;
@@ -16,7 +17,7 @@ public class TasksController : ControllerBase
         => _service = service;
 
     [HttpGet]
-    [SessionManagement(typeof(Todo.Infrastructure.Data.TodoDbContext), SessionStrategy.ReadOnly, IsolationLevel.ReadCommitted)]
+    [SessionManagement(typeof(Todo.Infrastructure.Persistence.Db.TodoDbContext), SessionStrategy.ReadOnly, IsolationLevel.ReadCommitted)]
     public async Task<ActionResult<IEnumerable<TaskItem>>> GetAll()
     {
         var items = await _service.GetAllAsync();
@@ -24,7 +25,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
-    [SessionManagement(typeof(Todo.Infrastructure.Data.TodoDbContext), SessionStrategy.Transaction, IsolationLevel.ReadCommitted)]
+    [SessionManagement(typeof(Todo.Infrastructure.Persistence.Db.TodoDbContext), SessionStrategy.Transaction, IsolationLevel.ReadCommitted)]
     public async Task<ActionResult<TaskItem>> Create([FromBody] CreateTaskRequest request)
     {
         try
@@ -39,7 +40,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    [SessionManagement(typeof(Todo.Infrastructure.Data.TodoDbContext), SessionStrategy.ReadOnly, IsolationLevel.ReadCommitted)]
+    [SessionManagement(typeof(Todo.Infrastructure.Persistence.Db.TodoDbContext), SessionStrategy.ReadOnly, IsolationLevel.ReadCommitted)]
     public async Task<ActionResult<TaskItem>> GetById([FromRoute] int id)
     {
         var item = await _service.GetByIdAsync(id);
@@ -48,7 +49,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPatch("{id:int}/complete")]
-    [SessionManagement(typeof(Todo.Infrastructure.Data.TodoDbContext), SessionStrategy.Transaction, IsolationLevel.ReadCommitted)]
+    [SessionManagement(typeof(Todo.Infrastructure.Persistence.Db.TodoDbContext), SessionStrategy.Transaction, IsolationLevel.ReadCommitted)]
     public async Task<ActionResult<TaskItem>> ToggleComplete([FromRoute] int id)
     {
         var item = await _service.ToggleCompleteAsync(id);
@@ -57,7 +58,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [SessionManagement(typeof(Todo.Infrastructure.Data.TodoDbContext), SessionStrategy.Transaction, IsolationLevel.ReadCommitted)]
+    [SessionManagement(typeof(Todo.Infrastructure.Persistence.Db.TodoDbContext), SessionStrategy.Transaction, IsolationLevel.ReadCommitted)]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
         var removed = await _service.DeleteAsync(id);

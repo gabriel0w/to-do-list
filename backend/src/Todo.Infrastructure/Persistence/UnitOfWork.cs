@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Todo.Application.Common.Persistence;
+using Todo.Application.Abstractions.Persistence;
 
 namespace Todo.Infrastructure.Persistence;
 
