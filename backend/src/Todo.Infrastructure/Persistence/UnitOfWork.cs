@@ -4,7 +4,7 @@ using Todo.Application.Abstractions.Persistence;
 
 namespace Todo.Infrastructure.Persistence;
 
-public class UnitOfWork<TDb> : IUnitOfWork where TDb : DbContext
+public class UnitOfWork<TDb> : IUnitOfWork<TDb> where TDb : DbContext
 {
     private readonly TDb _dbContext;
     private IDbContextTransaction? _transaction;

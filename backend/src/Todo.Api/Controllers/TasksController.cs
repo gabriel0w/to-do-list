@@ -35,7 +35,15 @@ public class TasksController : ControllerBase
         }
         catch (FluentValidation.ValidationException ex)
         {
-            return Problem(title: "Validation failed", detail: ex.Message, statusCode: 400);
+            var errors = ex.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+            var details = new ValidationProblemDetails(errors)
+            {
+                Title = "Validation failed",
+                Status = StatusCodes.Status400BadRequest
+            };
+            return BadRequest(details);
         }
     }
 

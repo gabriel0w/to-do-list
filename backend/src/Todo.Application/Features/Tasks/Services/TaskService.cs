@@ -26,10 +26,7 @@ public class TaskService : ITaskService
     {
         var validation = await _createValidator.ValidateAsync(request, ct);
         if (!validation.IsValid)
-        {
-            var errs = string.Join(", ", validation.Errors.Select(e => e.ErrorMessage));
-            throw new ValidationException(errs);
-        }
+            throw new ValidationException(validation.Errors);
 
         var nextOrder = await _repo.GetNextOrderIndexAsync(ct);
         var item = new TaskItem
