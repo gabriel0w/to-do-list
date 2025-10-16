@@ -5,7 +5,6 @@ using Todo.Infrastructure.Data;
 using Todo.Infrastructure.Repositories;
 using Todo.Application.Common.Persistence;
 using Todo.Infrastructure.Persistence;
-using Todo.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +22,7 @@ builder.Services.AddDbContext<TodoDbContext>(options =>
 builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskRequestValidator>();
 
 // Repositories & Services
-builder.Services.AddScoped<IUnitOfWork<TodoDbContext>, UnitOfWork<TodoDbContext>>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork<TodoDbContext>>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 
@@ -37,9 +36,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// Per-request Unit of Work
-app.UseMiddleware<UnitOfWorkMiddleware>();
 
 app.UseAuthorization();
 

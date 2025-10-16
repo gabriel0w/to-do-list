@@ -10,12 +10,12 @@ public abstract class AbstractRepository<TDb, TEntity, TId> : IRepository<TEntit
     where TEntity : AbstractEntity<TId>
 {
     protected readonly TDb _dbContext;
-    protected readonly IUnitOfWork<TDb> _unitOfWork;
+    protected readonly IUnitOfWork _unitOfWork;
     protected readonly DbSet<TEntity> DbSet;
 
     public bool IsTransactionOpen => _unitOfWork.IsTransactionOpen;
 
-    protected AbstractRepository(TDb dbContext, IUnitOfWork<TDb> unitOfWork)
+    protected AbstractRepository(TDb dbContext, IUnitOfWork unitOfWork)
     {
         _dbContext = dbContext;
         _unitOfWork = unitOfWork;

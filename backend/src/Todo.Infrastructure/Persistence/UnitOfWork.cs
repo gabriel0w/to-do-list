@@ -4,7 +4,7 @@ using Todo.Application.Common.Persistence;
 
 namespace Todo.Infrastructure.Persistence;
 
-public class UnitOfWork<TDb> : IUnitOfWork<TDb> where TDb : DbContext
+public class UnitOfWork<TDb> : IUnitOfWork where TDb : DbContext
 {
     private readonly TDb _dbContext;
     private IDbContextTransaction? _transaction;
@@ -64,4 +64,3 @@ public class UnitOfWork<TDb> : IUnitOfWork<TDb> where TDb : DbContext
 
     public Task SaveChangesAsync() => _dbContext.SaveChangesAsync();
 }
-

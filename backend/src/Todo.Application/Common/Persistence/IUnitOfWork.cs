@@ -1,6 +1,6 @@
 namespace Todo.Application.Common.Persistence;
 
-public interface IUnitOfWork<TDb>
+public interface IUnitOfWork
 {
     bool IsTransactionOpen { get; }
     void BeginTransaction(System.Data.IsolationLevel isolationLevel);

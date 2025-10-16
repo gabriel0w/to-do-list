@@ -9,7 +9,7 @@ namespace Todo.Infrastructure.Repositories;
 
 public class TaskRepository : AbstractRepository<TodoDbContext, TaskItem, int>, ITaskRepository
 {
-    public TaskRepository(TodoDbContext db, IUnitOfWork<TodoDbContext> unitOfWork) : base(db, unitOfWork)
+    public TaskRepository(TodoDbContext db, IUnitOfWork unitOfWork) : base(db, unitOfWork)
     { }
 
     public async Task<IReadOnlyList<TaskItem>> GetAllForListAsync(CancellationToken ct = default)
