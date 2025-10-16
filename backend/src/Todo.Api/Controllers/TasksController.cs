@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using FluentValidation;
 using Todo.Application.Tasks;
 using Todo.Domain.Entities;
-using Todo.Infrastructure.Data;
 
 namespace Todo.Api.Controllers;
 
@@ -11,59 +8,36 @@ namespace Todo.Api.Controllers;
 [Route("api/[controller]")]
 public class TasksController : ControllerBase
 {
-    private readonly TodoDbContext _db;
-    private readonly IValidator<CreateTaskRequest> _createValidator;
+    private readonly ITaskService _service;
 
-    public TasksController(TodoDbContext db, IValidator<CreateTaskRequest> createValidator)
-    {
-        _db = db;
-        _createValidator = createValidator;
-    }
+    public TasksController(ITaskService service)
+        => _service = service;
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TaskItem>>> GetAll()
     {
-        var items = await _db.Tasks
-            .OrderBy(t => t.IsDone)
-            .ThenBy(t => t.OrderIndex)
-            .ThenBy(t => t.CreatedAt)
-            .ToListAsync();
+        var items = await _service.GetAllAsync();
         return Ok(items);
     }
 
     [HttpPost]
     public async Task<ActionResult<TaskItem>> Create([FromBody] CreateTaskRequest request)
     {
-        var validation = await _createValidator.ValidateAsync(request);
-        if (!validation.IsValid)
+        try
         {
-            var errors = validation.Errors
-                .GroupBy(e => e.PropertyName)
-                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
-            return ValidationProblem(errors);
+            var item = await _service.CreateAsync(request);
+            return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
         }
-
-        // Pick next order index (append to end)
-        var maxOrder = await _db.Tasks.MaxAsync(t => (int?)t.OrderIndex) ?? 0;
-
-        var item = new TaskItem
+        catch (FluentValidation.ValidationException ex)
         {
-            Title = request.Title.Trim(),
-            IsDone = false,
-            OrderIndex = maxOrder + 1,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _db.Tasks.Add(item);
-        await _db.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
+            return Problem(title: "Validation failed", detail: ex.Message, statusCode: 400);
+        }
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<TaskItem>> GetById([FromRoute] int id)
     {
-        var item = await _db.Tasks.FindAsync(id);
+        var item = await _service.GetByIdAsync(id);
         if (item is null) return NotFound();
         return Ok(item);
     }
@@ -71,22 +45,16 @@ public class TasksController : ControllerBase
     [HttpPatch("{id:int}/complete")]
     public async Task<ActionResult<TaskItem>> ToggleComplete([FromRoute] int id)
     {
-        var item = await _db.Tasks.FindAsync(id);
+        var item = await _service.ToggleCompleteAsync(id);
         if (item is null) return NotFound();
-
-        item.IsDone = !item.IsDone;
-        await _db.SaveChangesAsync();
         return Ok(item);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
-        var item = await _db.Tasks.FindAsync(id);
-        if (item is null) return NotFound();
-
-        _db.Tasks.Remove(item);
-        await _db.SaveChangesAsync();
+        var removed = await _service.DeleteAsync(id);
+        if (!removed) return NotFound();
         return NoContent();
     }
 }

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using FluentValidation;
 using Todo.Application.Tasks;
 using Todo.Infrastructure.Data;
+using Todo.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,10 @@ builder.Services.AddDbContext<TodoDbContext>(options =>
 
 // FluentValidation - register validators from Application
 builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskRequestValidator>();
+
+// Repositories & Services
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 
 var app = builder.Build();
 
