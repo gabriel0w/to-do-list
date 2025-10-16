@@ -1,22 +1,20 @@
 using Microsoft.EntityFrameworkCore;
+using Todo.Application.Common.Persistence;
 using Todo.Application.Tasks;
 using Todo.Domain.Entities;
 using Todo.Infrastructure.Data;
+using Todo.Infrastructure.Persistence;
 
 namespace Todo.Infrastructure.Repositories;
 
-public class TaskRepository : ITaskRepository
+public class TaskRepository : AbstractRepository<TodoDbContext, TaskItem, int>, ITaskRepository
 {
-    private readonly TodoDbContext _db;
-
-    public TaskRepository(TodoDbContext db)
-    {
-        _db = db;
-    }
+    public TaskRepository(TodoDbContext db, IUnitOfWork<TodoDbContext> unitOfWork) : base(db, unitOfWork)
+    { }
 
     public async Task<IReadOnlyList<TaskItem>> GetAllForListAsync(CancellationToken ct = default)
     {
-        return await _db.Tasks
+        return await DbSet
             .AsNoTracking()
             .OrderBy(t => t.IsDone)
             .ThenBy(t => t.OrderIndex)
@@ -24,32 +22,28 @@ public class TaskRepository : ITaskRepository
             .ToListAsync(ct);
     }
 
-    public Task<TaskItem?> GetByIdAsync(int id, CancellationToken ct = default)
-        => _db.Tasks.FirstOrDefaultAsync(t => t.Id == id, ct)!;
-
     public async Task<int> GetNextOrderIndexAsync(CancellationToken ct = default)
     {
-        var max = await _db.Tasks.MaxAsync(t => (int?)t.OrderIndex, ct) ?? 0;
+        var max = await DbSet.MaxAsync(t => (int?)t.OrderIndex, ct) ?? 0;
         return max + 1;
     }
 
     public async Task<TaskItem> AddAsync(TaskItem item, CancellationToken ct = default)
     {
-        _db.Tasks.Add(item);
-        await _db.SaveChangesAsync(ct);
+        await DbSet.AddAsync(item, ct);
+        await _dbContext.SaveChangesAsync(ct);
         return item;
     }
 
     public async Task UpdateAsync(TaskItem item, CancellationToken ct = default)
     {
-        _db.Tasks.Update(item);
-        await _db.SaveChangesAsync(ct);
+        DbSet.Update(item);
+        await _dbContext.SaveChangesAsync(ct);
     }
 
     public async Task DeleteAsync(TaskItem item, CancellationToken ct = default)
     {
-        _db.Tasks.Remove(item);
-        await _db.SaveChangesAsync(ct);
+        DbSet.Remove(item);
+        await _dbContext.SaveChangesAsync(ct);
     }
 }
-

@@ -3,6 +3,8 @@ using FluentValidation;
 using Todo.Application.Tasks;
 using Todo.Infrastructure.Data;
 using Todo.Infrastructure.Repositories;
+using Todo.Application.Common.Persistence;
+using Todo.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,7 @@ builder.Services.AddDbContext<TodoDbContext>(options =>
 builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskRequestValidator>();
 
 // Repositories & Services
+builder.Services.AddScoped<IUnitOfWork<TodoDbContext>, UnitOfWork<TodoDbContext>>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 
