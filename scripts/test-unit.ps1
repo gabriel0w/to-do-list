@@ -1,8 +1,11 @@
 $ErrorActionPreference = 'Stop'
-Push-Location (Join-Path $PSScriptRoot '..' 'backend')
+$root = Split-Path -Parent $PSScriptRoot
+$backendPath = Join-Path $root 'backend'
+Push-Location $backendPath
 try {
   dotnet test tests/Todo.UnitTests -v minimal
-} finally {
+}
+finally {
   Pop-Location
 }
 
