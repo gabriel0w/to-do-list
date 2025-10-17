@@ -6,7 +6,8 @@ COPY package*.json ./
 # cache npm data across builds
 RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline --no-audit --no-fund
 COPY . .
-RUN npm run build -- --configuration production --output-path=/app/www
+RUN npm run build -- --configuration production --output-path=/app/www \
+ && if [ -d /app/www/browser ]; then mv /app/www/browser/* /app/www/ && rmdir /app/www/browser; fi
 
 FROM nginx:alpine AS final
 # Clean default content just in case
