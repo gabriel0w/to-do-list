@@ -17,6 +17,7 @@ namespace Todo.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("public")
                 .HasAnnotation("ProductVersion", "9.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -54,7 +55,7 @@ namespace Todo.Infrastructure.Migrations
 
                     b.HasIndex("IsDone", "OrderIndex", "CreatedAt");
 
-                    b.ToTable("tasks", (string)null);
+                    b.ToTable("tasks", "public");
                 });
 #pragma warning restore 612, 618
         }
