@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { TasksService } from '../../../core/services/tasks.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { TaskItem, TaskSortField, TaskStatusFilter, SortDirection } from '../../../core/models/task';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -35,6 +36,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 export class TasksListComponent implements OnInit {
   private svc = inject(TasksService);
   private snack = inject(MatSnackBar);
+  private notifier = inject(NotificationService);
   private fb = inject(FormBuilder);
 
   items: TaskItem[] = [];
@@ -52,6 +54,8 @@ export class TasksListComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    // Request permission for browser notifications (non-blocking)
+    this.notifier.requestPermissionIfNeeded().finally(() => {});
     this.load();
   }
 
@@ -87,7 +91,14 @@ export class TasksListComponent implements OnInit {
 
   toggle(item: TaskItem) {
     this.svc.toggleComplete(item.id).subscribe({
-      next: (updated) => { item.isDone = updated.isDone; },
+      next: (updated) => {
+        item.isDone = updated.isDone;
+        if (item.isDone) {
+          this.notifier.notify('Task completed', item.title);
+        } else {
+          this.snack.open('Task reopened', 'Close', { duration: 1500 });
+        }
+      },
       error: () => this.snack.open('Failed to toggle', 'Close', { duration: 2000 })
     });
   }
