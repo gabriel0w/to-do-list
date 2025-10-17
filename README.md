@@ -41,27 +41,39 @@ Funcionalidades: criar, listar, concluir (botão e Drag&Drop), excluir, reordena
 - Notificações (snackbar; Web Notifications opcional)
 - Testes unitários e de integração (API + PostgreSQL via Testcontainers)
 
-## ⚙️ Setup Rápido (Dev)
+## ⚙️ Dev Setup (atualizado)
 ### Pré‑requisitos
-- Node 20+
 - .NET 8 SDK
-- Docker + Docker Compose
+- Docker + Docker Compose (para Postgres local e testes de integração)
+- Node 20+ (para o frontend, quando aplicável)
 
-### Subir ambiente (containers)
+### Subir infraestrutura (Postgres)
 ```bash
-cd deploy
+cd to-do-list/deploy
 docker compose -f docker-compose.dev.yml up -d
 ```
-**Serviços:**
+Serviços:
 - PostgreSQL → `localhost:5432` (db: `tododb`, user: `todo`, pass: `todo`)
-- API .NET → `http://localhost:8080`
-- Angular (quando buildado) → `http://localhost:4200`
 
-### String de conexão (exemplo)
+### Rodar API (.NET)
+```bash
+cd to-do-list/backend
+# (primeira vez) aplicar migrações
+dotnet ef database update --project src/Todo.Infrastructure --startup-project src/Todo.Api
+
+# executar API
+dotnet run --project src/Todo.Api
 ```
-Host=db;Port=5432;Database=tododb;Username=todo;Password=todo
+URLs em dev (padrão):
+- Swagger: `http://localhost:5062/swagger`
+- API base: `http://localhost:5062`
+
+### Connection string
+Em dev, a API aponta para Postgres local (Host=localhost). Se rodar a API em container, use `Host=db`.
+
 ```
-> Em desenvolvimento local fora do Docker, use `Host=localhost`.
+Host=localhost;Port=5432;Database=tododb;Username=todo;Password=todo
+```
 
 ## 🧱 Backend (.NET + Clean Architecture)
 ### Camadas
@@ -80,11 +92,45 @@ dotnet run --project src/Todo.Api
 ```
 
 ### Testes
+Tipos:
+- Unit: regras de domínio/aplicação.
+- Integração: repositório/EF + PostgreSQL via Testcontainers.
+
+Comandos:
 ```bash
-dotnet test backend/tests/Todo.UnitTests
-dotnet test backend/tests/Todo.IntegrationTests
+# na pasta backend
+cd to-do-list/backend
+
+# unit
+dotnet test tests/Todo.UnitTests -v minimal
+
+# integração (precisa Docker e rede para restaurar pacotes)
+dotnet test tests/Todo.IntegrationTests -v minimal
 ```
-Os testes de integração usam **Testcontainers** com PostgreSQL.
+
+#### Cobertura (coverage)
+Coleta com data collector (Coverlet):
+```bash
+dotnet test tests/Todo.UnitTests --collect:"XPlat Code Coverage" -v minimal
+dotnet test tests/Todo.IntegrationTests --collect:"XPlat Code Coverage" -v minimal
+```
+Saída: arquivos `coverage.cobertura.xml` em `TestResults/<run>/` de cada projeto.
+Se necessário, adicione o coletor nos projetos de teste:
+```bash
+dotnet add tests/Todo.UnitTests package coverlet.collector
+dotnet add tests/Todo.IntegrationTests package coverlet.collector
+```
+Para HTML consolidado, use ReportGenerator (opcional).
+
+### Endpoints atuais (MVP + Sprint 2)
+- `GET /api/tasks` com filtros por query: `status=all|open|done`, `sort=orderIndex|createdAt`, `direction=asc|desc`.
+- `POST /api/tasks` — cria tarefa (validação via FluentValidation).
+- `GET /api/tasks/{id}` — obtém tarefa.
+- `PATCH /api/tasks/{id}/complete` — alterna conclusão.
+- `DELETE /api/tasks/{id}` — remove tarefa.
+- `PUT /api/tasks/reorder` — reordena em lote (`[{ id, orderIndex }, ...]`), idempotente.
+
+Erros 400 retornam ValidationProblemDetails (com `traceId`); 404 para recursos inexistentes.
 
 ## 💻 Frontend (Angular)
 ```bash
@@ -102,13 +148,5 @@ Commits: **Conventional Commits**.
 - **ci-backend.yml**: build, testes unit/integration (.NET + Postgres service ou Testcontainers).
 - **ci-frontend.yml**: lint, unit tests, build.
 (Deploy/CD pode ser adicionado depois.)
-
-## 🧠 Sprint 1 (alvo)
-- Monorepo + README (este arquivo) ✅
-- Backend skeleton (Clean Arch) + Swagger + Health
-- EF Core + Npgsql + migração inicial
-- Entidade `Task` + endpoints básicos (GET/POST/DELETE)
-- Unit tests Domain/Application
-- CI backend (build + unit)
 
 MIT © 2025
