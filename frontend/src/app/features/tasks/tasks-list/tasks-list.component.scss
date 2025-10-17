@@ -1,0 +1,9 @@
+.container { max-width: 800px; margin: 24px auto; }
+.list { display: flex; flex-direction: column; gap: 8px; }
+.list-item { display: flex; align-items: center; padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fff; }
+.title { margin-left: 8px; }
+.title.done { text-decoration: line-through; color: #777; }
+.spacer { flex: 1; }
+.create-form { display: flex; gap: 8px; margin-bottom: 12px; }
+.title-field { flex: 1; }
+.filters { display: flex; gap: 12px; margin: 12px 0; }

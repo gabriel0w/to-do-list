@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using FluentValidation;
 using Todo.Application.Features.Tasks.Contracts;
@@ -48,11 +53,47 @@ public class TaskServiceTests
         public TaskItem SaveOrUpdate(TaskItem entity) => entity;
         public IEnumerable<TaskItem> SaveOrUpdate(IEnumerable<TaskItem> entities) => entities;
         public Task UpdateAsync(TaskItem item, CancellationToken ct = default) => Task.CompletedTask;
-        public Task<IEnumerable<TaskItem>> Update(IEnumerable<TaskItem> entities) => Task.FromResult(entities);
+        public IEnumerable<TaskItem> Update(IEnumerable<TaskItem> entities) => entities;
         public TaskItem Update(TaskItem entity) => entity;
         public void Delete(TaskItem entity) => _items.Remove(entity);
         public void Delete(IEnumerable<TaskItem> entities) { foreach (var e in entities) _items.Remove(e); }
         public void DeleteById(int id) => _items.RemoveAll(i => i.Id == id);
+
+        // New members for Sprint 2 contract
+        public Task<IReadOnlyList<TaskItem>> GetFilteredAsync(Todo.Application.Features.Tasks.Contracts.TaskListFilter filter, CancellationToken ct = default)
+        {
+            IEnumerable<TaskItem> q = _items;
+            q = filter.Status switch
+            {
+                Todo.Application.Features.Tasks.Contracts.TaskStatusFilter.Open => q.Where(t => !t.IsDone),
+                Todo.Application.Features.Tasks.Contracts.TaskStatusFilter.Done => q.Where(t => t.IsDone),
+                _ => q
+            };
+            q = (filter.Sort, filter.Direction) switch
+            {
+                (Todo.Application.Features.Tasks.Contracts.TaskSortField.CreatedAt, Todo.Application.Features.Tasks.Contracts.SortDirection.Asc) => q.OrderBy(t => t.CreatedAt),
+                (Todo.Application.Features.Tasks.Contracts.TaskSortField.CreatedAt, Todo.Application.Features.Tasks.Contracts.SortDirection.Desc) => q.OrderByDescending(t => t.CreatedAt),
+                (Todo.Application.Features.Tasks.Contracts.TaskSortField.OrderIndex, Todo.Application.Features.Tasks.Contracts.SortDirection.Desc) => q.OrderByDescending(t => t.OrderIndex).ThenBy(t => t.CreatedAt),
+                _ => q.OrderBy(t => t.OrderIndex).ThenBy(t => t.CreatedAt)
+            };
+            return Task.FromResult((IReadOnlyList<TaskItem>)q.ToList());
+        }
+
+        public Task ReorderAsync(IEnumerable<Todo.Application.Features.Tasks.Contracts.ReorderItem> items, CancellationToken ct = default)
+        {
+            var map = items.ToDictionary(i => i.Id, i => i.OrderIndex);
+            foreach (var t in _items.Where(x => map.ContainsKey(x.Id)))
+            {
+                t.OrderIndex = map[t.Id];
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task<HashSet<int>> GetExistingIdsAsync(IEnumerable<int> ids, CancellationToken ct = default)
+        {
+            var existing = _items.Select(i => i.Id).Intersect(ids).ToHashSet();
+            return Task.FromResult(existing);
+        }
     }
 
     [Fact]
@@ -60,7 +101,7 @@ public class TaskServiceTests
     {
         var repo = new FakeTaskRepository();
         var validator = new CreateTaskRequestValidator();
-        var svc = new TaskService(repo, validator);
+        var svc = new TaskService(repo, validator, Microsoft.Extensions.Logging.Abstractions.NullLogger<TaskService>.Instance);
 
         Func<Task> act = async () => await svc.CreateAsync(new CreateTaskRequest { Title = "   " });
 
@@ -72,7 +113,7 @@ public class TaskServiceTests
     {
         var repo = new FakeTaskRepository();
         var validator = new CreateTaskRequestValidator();
-        var svc = new TaskService(repo, validator);
+        var svc = new TaskService(repo, validator, Microsoft.Extensions.Logging.Abstractions.NullLogger<TaskService>.Instance);
 
         var created = await svc.CreateAsync(new CreateTaskRequest { Title = "  Task A  " });
 
@@ -87,7 +128,7 @@ public class TaskServiceTests
     {
         var repo = new FakeTaskRepository();
         var validator = new CreateTaskRequestValidator();
-        var svc = new TaskService(repo, validator);
+        var svc = new TaskService(repo, validator, Microsoft.Extensions.Logging.Abstractions.NullLogger<TaskService>.Instance);
 
         var created = await svc.CreateAsync(new CreateTaskRequest { Title = "Task" });
         created.IsDone.Should().BeFalse();
@@ -101,7 +142,7 @@ public class TaskServiceTests
     {
         var repo = new FakeTaskRepository();
         var validator = new CreateTaskRequestValidator();
-        var svc = new TaskService(repo, validator);
+        var svc = new TaskService(repo, validator, Microsoft.Extensions.Logging.Abstractions.NullLogger<TaskService>.Instance);
 
         var created = await svc.CreateAsync(new CreateTaskRequest { Title = "Task" });
 
@@ -112,4 +153,3 @@ public class TaskServiceTests
         notFound.Should().BeFalse();
     }
 }
-
