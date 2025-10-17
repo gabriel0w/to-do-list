@@ -109,12 +109,6 @@ dotnet test tests/Todo.UnitTests -v minimal
 dotnet test tests/Todo.IntegrationTests -v minimal
 ```
 
-Cobertura (Coverlet):
-```
-dotnet test tests/Todo.UnitTests --collect:"XPlat Code Coverage" -v minimal
-dotnet test tests/Todo.IntegrationTests --collect:"XPlat Code Coverage" -v minimal
-```
-
 E2E (frontend):
 ```
 cd to-do-list/frontend
