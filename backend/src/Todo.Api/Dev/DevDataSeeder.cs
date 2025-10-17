@@ -17,6 +17,11 @@ public static class DevDataSeeder
             var reset = cfg.GetValue<bool>("Seed:Reset", false);
             var force = cfg.GetValue<bool>("Seed:Force", false);
             await db.Database.MigrateAsync();
+            // Only seed when explicitly requested via flags
+            if (!reset && !force)
+            {
+                return;
+            }
 
             if (reset)
             {
@@ -39,7 +44,7 @@ public static class DevDataSeeder
                 }
             }
 
-            if (reset || force || !await db.Tasks.AnyAsync())
+            if (reset || force)
             {
                 var now = DateTime.UtcNow;
                 db.Tasks.AddRange(

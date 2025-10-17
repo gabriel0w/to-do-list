@@ -3,10 +3,12 @@ set -euo pipefail
 
 NO_CACHE=""
 PULL=""
+POP_DB=false
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --no-cache) NO_CACHE="--no-cache" ; shift ;;
     --pull)     PULL="--pull"       ; shift ;;
+    --populate-db) POP_DB=true        ; shift ;;
     *) echo "Unknown arg: $1" ; exit 2 ;;
   esac
 done
@@ -30,3 +32,6 @@ echo "[startup] Done. URLs:"
 echo "  API  : http://localhost:8080 (Swagger in /swagger)"
 echo "  WEB  : http://localhost:8081"
 
+if [[ "$POP_DB" == true ]]; then
+  "$(cd "$(dirname "$0")" && pwd)/scripts/populate-db.sh" "http://localhost:8080"
+fi

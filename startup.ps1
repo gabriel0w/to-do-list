@@ -2,7 +2,8 @@ $ErrorActionPreference = 'Stop'
 
 param(
   [switch]$NoCache,
-  [switch]$Pull
+  [switch]$Pull,
+  [switch]$PopulateDb
 )
 
 Write-Host "[startup] Enabling Docker BuildKit for this session..."
@@ -29,3 +30,7 @@ Write-Host "[startup] Done. URLs:" -ForegroundColor Green
 Write-Host "  API  : http://localhost:8080 (Swagger em /swagger)"
 Write-Host "  WEB  : http://localhost:8081"
 
+if ($PopulateDb) {
+  Write-Host "[startup] Populating database via API..."
+  & (Join-Path $PSScriptRoot 'scripts' 'populate-db.ps1') -ApiBase 'http://localhost:8080'
+}
