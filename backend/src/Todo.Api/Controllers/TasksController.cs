@@ -18,9 +18,11 @@ public class TasksController : ControllerBase
 
     [HttpGet]
     [SessionManagement(typeof(Todo.Infrastructure.Persistence.Db.TodoDbContext), SessionStrategy.ReadOnly, IsolationLevel.ReadCommitted)]
-    public async Task<ActionResult<IEnumerable<TaskItem>>> GetAll()
+    public async Task<ActionResult<IEnumerable<TaskItem>>> GetAll([FromQuery] TaskListFilter? filter)
     {
-        var items = await _service.GetAllAsync();
+        var items = filter is null ?
+            await _service.GetAllAsync() :
+            await _service.GetAllAsync(filter);
         return Ok(items);
     }
 
@@ -56,6 +58,14 @@ public class TasksController : ControllerBase
     {
         var removed = await _service.DeleteAsync(id);
         if (!removed) return NotFound();
+        return NoContent();
+    }
+
+    [HttpPut("reorder")]
+    [SessionManagement(typeof(Todo.Infrastructure.Persistence.Db.TodoDbContext), SessionStrategy.Transaction, IsolationLevel.ReadCommitted)]
+    public async Task<IActionResult> Reorder([FromBody] ReorderTasksRequest request)
+    {
+        await _service.ReorderAsync(request);
         return NoContent();
     }
 }
