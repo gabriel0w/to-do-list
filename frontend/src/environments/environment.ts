@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5062/api'
+  // Use proxy in dev so we avoid CORS and keep relative URLs
+  apiUrl: '/api'
 };
-
