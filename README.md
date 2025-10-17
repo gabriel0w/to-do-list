@@ -67,6 +67,16 @@ URLs:
 Host=localhost;Port=5432;Database=tododb;Username=todo;Password=todo
 ```
 
+### População de dados (opcional)
+- Via scripts (recomendado):
+  - Windows: `scripts/populate-db.ps1 -ApiBase 'http://localhost:8080'`
+  - Linux/macOS: `scripts/populate-db.sh http://localhost:8080`
+  - Ou já na subida: `./startup.ps1 -PopulateDb` | `./startup.sh --populate-db`
+- Via flags no backend (apenas quando desejar e em Development):
+  - `Seed__Reset=true` limpa e insere dados padrão
+  - `Seed__Force=true` apenas insere dados padrão (sem limpar)
+  - Observação: por padrão o seeder não executa nada; só roda quando essas flags forem definidas.
+
 ## API (principais endpoints)
 - `GET /api/tasks` — filtros por query: `status=all|open|done`, `sort=orderIndex|createdAt`, `direction=asc|desc`
 - `POST /api/tasks` — cria tarefa (validação via FluentValidation)
@@ -145,4 +155,3 @@ npm run e2e
 
 ## Licença
 MIT © 2025
-
