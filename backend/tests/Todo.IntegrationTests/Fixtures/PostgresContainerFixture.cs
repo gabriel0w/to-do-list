@@ -1,21 +1,19 @@
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Containers;
+using Testcontainers.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Todo.Infrastructure.Persistence.Db;
+using Xunit;
 
 namespace Todo.IntegrationTests.Fixtures;
 
 public class PostgresContainerFixture : IAsyncLifetime
 {
-    public string ConnectionString => $"Host=localhost;Port={_container.GetMappedPublicPort(5432)};Database=tododb;Username=todo;Password=todo";
+    public string ConnectionString => _container.GetConnectionString();
 
-    private readonly IContainer _container = new ContainerBuilder()
-        .WithImage("postgres:16")
-        .WithEnvironment("POSTGRES_DB", "tododb")
-        .WithEnvironment("POSTGRES_USER", "todo")
-        .WithEnvironment("POSTGRES_PASSWORD", "todo")
-        .WithPortBinding(0, 5432)
-        .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(5432))
+    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
+        .WithImage("postgres:16-alpine")
+        .WithDatabase("tododb")
+        .WithUsername("todo")
+        .WithPassword("todo")
         .Build();
 
     public async Task InitializeAsync()
@@ -36,4 +34,3 @@ public class PostgresContainerFixture : IAsyncLifetime
         await _container.DisposeAsync();
     }
 }
-
