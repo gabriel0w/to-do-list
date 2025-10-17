@@ -1,5 +1,43 @@
 <div class="container">
   <h2>Tasks</h2>
+
+  <form (ngSubmit)="onCreate()" [formGroup]="form" class="create-form">
+    <mat-form-field appearance="outline" class="title-field">
+      <mat-label>New task</mat-label>
+      <input matInput placeholder="Type task title" formControlName="title" [disabled]="creating" />
+    </mat-form-field>
+    <button mat-raised-button color="primary" type="submit" [disabled]="creating || form.invalid">Add</button>
+  </form>
+
+  <div class="filters">
+    <mat-form-field appearance="fill">
+      <mat-label>Status</mat-label>
+      <mat-select [(value)]="status" (selectionChange)="onFilterChange()">
+        <mat-option value="all">All</mat-option>
+        <mat-option value="open">Open</mat-option>
+        <mat-option value="done">Done</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Sort</mat-label>
+      <mat-select [(value)]="sort" (selectionChange)="onFilterChange()">
+        <mat-option value="orderIndex">Order</mat-option>
+        <mat-option value="createdAt">Created</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Direction</mat-label>
+      <mat-select [(value)]="direction" (selectionChange)="onFilterChange()">
+        <mat-option value="asc">Asc</mat-option>
+        <mat-option value="desc">Desc</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+
   <div cdkDropList (cdkDropListDropped)="drop($event)" class="list">
     <div *ngFor="let t of items; index as i" cdkDrag class="list-item">
       <button mat-icon-button color="primary" (click)="toggle(t)">
@@ -12,4 +50,3 @@
     </div>
   </div>
 </div>
-

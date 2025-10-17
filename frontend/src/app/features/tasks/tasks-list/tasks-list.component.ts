@@ -6,21 +6,50 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { TasksService } from '../../../core/services/tasks.service';
-import { TaskItem } from '../../../core/models/task';
+import { TaskItem, TaskSortField, TaskStatusFilter, SortDirection } from '../../../core/models/task';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
   selector: 'app-tasks-list',
   standalone: true,
-  imports: [CommonModule, MatListModule, MatButtonModule, MatIconModule, MatSnackBarModule, DragDropModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatListModule,
+    MatButtonModule,
+    MatIconModule,
+    MatSnackBarModule,
+    MatProgressBarModule,
+    DragDropModule
+  ],
   templateUrl: './tasks-list.component.html',
   styleUrls: ['./tasks-list.component.scss']
 })
 export class TasksListComponent implements OnInit {
   private svc = inject(TasksService);
   private snack = inject(MatSnackBar);
+  private fb = inject(FormBuilder);
 
   items: TaskItem[] = [];
   loading = false;
+  creating = false;
+
+  // Filters
+  status: TaskStatusFilter = 'all';
+  sort: TaskSortField = 'orderIndex';
+  direction: SortDirection = 'asc';
+
+  // Form
+  form = this.fb.group({
+    title: ['', [Validators.required, Validators.maxLength(200)]]
+  });
 
   ngOnInit(): void {
     this.load();
@@ -28,9 +57,31 @@ export class TasksListComponent implements OnInit {
 
   load() {
     this.loading = true;
-    this.svc.list().subscribe({
+    this.svc.list({ status: this.status, sort: this.sort, direction: this.direction }).subscribe({
       next: (res) => { this.items = res; this.loading = false; },
       error: () => { this.snack.open('Failed to load tasks', 'Close', { duration: 2500 }); this.loading = false; }
+    });
+  }
+
+  onFilterChange() {
+    this.load();
+  }
+
+  onCreate() {
+    if (this.form.invalid) return;
+    const title = this.form.value.title!.trim();
+    if (!title) return;
+    this.creating = true;
+    this.svc.create(title).subscribe({
+      next: (created) => {
+        this.items.push(created);
+        // keep order by orderIndex
+        this.items.sort((a, b) => a.orderIndex - b.orderIndex || a.createdAt.localeCompare(b.createdAt));
+        this.form.reset();
+        this.snack.open('Task created', 'Close', { duration: 1500 });
+        this.creating = false;
+      },
+      error: () => { this.snack.open('Failed to create', 'Close', { duration: 2000 }); this.creating = false; }
     });
   }
 
@@ -58,4 +109,3 @@ export class TasksListComponent implements OnInit {
     });
   }
 }
-

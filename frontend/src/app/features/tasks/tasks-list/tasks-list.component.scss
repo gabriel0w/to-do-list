@@ -4,3 +4,6 @@
 .title { margin-left: 8px; }
 .title.done { text-decoration: line-through; color: #777; }
 .spacer { flex: 1; }
+.create-form { display: flex; gap: 8px; margin-bottom: 12px; }
+.title-field { flex: 1; }
+.filters { display: flex; gap: 12px; margin: 12px 0; }
