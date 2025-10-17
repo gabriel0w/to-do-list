@@ -12,6 +12,8 @@ public class CreateTaskRequestValidator : AbstractValidator<CreateTaskRequest>
             .NotEmpty().WithMessage("Title is required")
             .Must(title => !string.IsNullOrWhiteSpace(title))
                 .WithMessage("Title cannot be whitespace only")
-            .MaximumLength(200).WithMessage("Title must be at most 200 characters");
+            .MaximumLength(200).WithMessage("Title must be at most 200 characters")
+            .Matches(@"^(?=.*\S).{1,200}$").WithMessage("Title must contain non-whitespace characters")
+            .Must(t => t.Trim().Length > 0).WithMessage("Title cannot be empty after trimming");
     }
 }

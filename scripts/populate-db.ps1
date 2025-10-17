@@ -1,14 +1,25 @@
-$ErrorActionPreference = 'Stop'
 param(
   [string]$ApiBase = 'http://localhost:8080'
 )
 
+$ErrorActionPreference = 'Stop'
+
 function Wait-ApiReady {
   param([string]$Url, [int]$TimeoutSec = 60)
+
   $end = (Get-Date).AddSeconds($TimeoutSec)
   while ((Get-Date) -lt $end) {
     try {
-      $r = Invoke-WebRequest -UseBasicParsing -Uri "$Url/health" -TimeoutSec 5
+      # Compatível com PS 5.1 (sem TimeoutSec) e PS 7+ (com TimeoutSec)
+      $iw = @{
+        Uri = "$Url/health"
+        UseBasicParsing = $true
+      }
+      if ( (Get-Command Invoke-WebRequest).Parameters.ContainsKey('TimeoutSec') ) {
+        $iw['TimeoutSec'] = 5
+      }
+
+      $r = Invoke-WebRequest @iw
       if ($r.StatusCode -ge 200 -and $r.StatusCode -lt 500) { return }
     } catch {}
     Start-Sleep -Seconds 2
@@ -35,4 +46,3 @@ foreach ($t in $titles) {
 }
 
 Write-Host "[populate-db] Done."
-
