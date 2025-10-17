@@ -34,7 +34,7 @@ public class TaskRepository : AbstractRepository<TodoDbContext, TaskItem, int>, 
             _ => q
         };
 
-        q = (filter.Sort, filter.SortDirection) switch
+        q = (filter.Sort, filter.Direction) switch
         {
             (TaskSortField.CreatedAt, SortDirection.Asc) => q.OrderBy(t => t.CreatedAt),
             (TaskSortField.CreatedAt, SortDirection.Desc) => q.OrderByDescending(t => t.CreatedAt),

@@ -8,6 +8,5 @@ public class TaskListFilter
 {
     public TaskStatusFilter Status { get; set; } = TaskStatusFilter.All;
     public TaskSortField Sort { get; set; } = TaskSortField.OrderIndex;
-    public SortDirection SortDirection { get; set; } = SortDirection.Asc;
+    public SortDirection Direction { get; set; } = SortDirection.Asc;
 }
-
