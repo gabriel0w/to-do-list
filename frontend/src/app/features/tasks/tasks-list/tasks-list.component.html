@@ -1,15 +1,15 @@
 <div class="container">
   <h2>Tasks</h2>
 
-  <form (ngSubmit)="onCreate()" [formGroup]="form" class="create-form">
+  <form (ngSubmit)="onCreate()" [formGroup]="form" class="create-form" data-testid="create-form">
     <mat-form-field appearance="outline" class="title-field">
       <mat-label>New task</mat-label>
-      <input matInput placeholder="Type task title" formControlName="title" [disabled]="creating" />
+      <input matInput placeholder="Type task title" formControlName="title" [disabled]="creating" data-testid="title-input" />
     </mat-form-field>
-    <button mat-raised-button color="primary" type="submit" [disabled]="creating || form.invalid">Add</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="creating || form.invalid" data-testid="add-btn">Add</button>
   </form>
 
-  <div class="filters">
+  <div class="filters" data-testid="filters">
     <mat-form-field appearance="fill">
       <mat-label>Status</mat-label>
       <mat-select [(value)]="status" (selectionChange)="onFilterChange()">
@@ -36,17 +36,19 @@
     </mat-form-field>
   </div>
 
-  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar *ngIf="loading" mode="indeterminate" data-testid="loading"></mat-progress-bar>
 
-  <div cdkDropList (cdkDropListDropped)="drop($event)" class="list">
-    <div *ngFor="let t of items; index as i" cdkDrag class="list-item">
-      <button mat-icon-button color="primary" (click)="toggle(t)">
+  <div *ngIf="!loading && items.length === 0" class="empty" data-testid="empty">No tasks yet. Create your first task.</div>
+
+  <div cdkDropList (cdkDropListDropped)="drop($event)" class="list" data-testid="list">
+    <div *ngFor="let t of items; index as i" cdkDrag class="list-item" [attr.data-testid]="'item-' + t.id">
+      <button mat-icon-button color="primary" (click)="toggle(t)" [attr.data-testid]="'toggle-' + t.id">
         <mat-icon>{{ t.isDone ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
       </button>
       <span class="title" [class.done]="t.isDone">{{ t.title }}</span>
       <span class="spacer"></span>
-      <button mat-icon-button color="warn" (click)="remove(t)"><mat-icon>delete</mat-icon></button>
-      <button mat-icon-button cdkDragHandle><mat-icon>drag_indicator</mat-icon></button>
+      <button mat-icon-button color="warn" (click)="remove(t)" [attr.data-testid]="'delete-' + t.id"><mat-icon>delete</mat-icon></button>
+      <button mat-icon-button cdkDragHandle [attr.data-testid]="'drag-' + t.id"><mat-icon>drag_indicator</mat-icon></button>
     </div>
   </div>
 </div>

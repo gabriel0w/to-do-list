@@ -17,6 +17,7 @@ builder.Services.AddControllers(options =>
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks();
 
 // EF Core - Npgsql
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -39,6 +40,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    await Todo.Api.Dev.DevDataSeeder.SeedAsync(app);
 }
 
 app.UseHttpsRedirection();
@@ -46,5 +48,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();
