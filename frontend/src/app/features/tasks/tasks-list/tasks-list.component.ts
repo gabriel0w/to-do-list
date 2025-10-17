@@ -98,6 +98,13 @@ export class TasksListComponent implements OnInit {
         } else {
           this.snack.open('Task reopened', 'Close', { duration: 1500 });
         }
+        // Keep view consistent with current filter
+        if (this.status === 'open' && item.isDone) {
+          this.items = this.items.filter(i => i.id !== item.id);
+        }
+        if (this.status === 'done' && !item.isDone) {
+          this.items = this.items.filter(i => i.id !== item.id);
+        }
       },
       error: () => this.snack.open('Failed to toggle', 'Close', { duration: 2000 })
     });
