@@ -16,5 +16,30 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+
+  api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: todo_api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=tododb;Username=todo;Password=todo
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: todo_web
+    ports:
+      - "8081:80"
+    depends_on:
+      api:
+        condition: service_started
 volumes:
   pg_data:
