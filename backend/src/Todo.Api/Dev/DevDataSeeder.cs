@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Todo.Infrastructure.Persistence.Db;
 using Todo.Domain.Entities;
+using Microsoft.Extensions.Configuration;
 
 namespace Todo.Api.Dev;
 
@@ -12,9 +13,33 @@ public static class DevDataSeeder
         {
             using var scope = app.Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<TodoDbContext>();
+            var cfg = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            var reset = cfg.GetValue<bool>("Seed:Reset", false);
+            var force = cfg.GetValue<bool>("Seed:Force", false);
             await db.Database.MigrateAsync();
 
-            if (!await db.Tasks.AnyAsync())
+            if (reset)
+            {
+                // Clear existing tasks to ensure deterministic dev data
+                try
+                {
+#if NET8_0_OR_GREATER
+                    await db.Tasks.ExecuteDeleteAsync();
+#else
+                    db.Tasks.RemoveRange(db.Tasks);
+                    await db.SaveChangesAsync();
+#endif
+                }
+                catch
+                {
+                    // Fallback if provider doesn't support ExecuteDeleteAsync
+                    var all = await db.Tasks.ToListAsync();
+                    db.Tasks.RemoveRange(all);
+                    await db.SaveChangesAsync();
+                }
+            }
+
+            if (reset || force || !await db.Tasks.AnyAsync())
             {
                 var now = DateTime.UtcNow;
                 db.Tasks.AddRange(

@@ -112,7 +112,10 @@ export class TasksListComponent implements OnInit {
 
   remove(item: TaskItem) {
     this.svc.delete(item.id).subscribe({
-      next: () => { this.items = this.items.filter(i => i.id !== item.id); },
+      next: () => {
+        this.items = this.items.filter(i => i.id !== item.id);
+        this.notifier.notify('Task deleted', item.title);
+      },
       error: () => this.snack.open('Failed to delete', 'Close', { duration: 2000 })
     });
   }
