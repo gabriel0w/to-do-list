@@ -28,23 +28,8 @@ public class TasksController : ControllerBase
     [SessionManagement(typeof(Todo.Infrastructure.Persistence.Db.TodoDbContext), SessionStrategy.Transaction, IsolationLevel.ReadCommitted)]
     public async Task<ActionResult<TaskItem>> Create([FromBody] CreateTaskRequest request)
     {
-        try
-        {
-            var item = await _service.CreateAsync(request);
-            return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
-        }
-        catch (FluentValidation.ValidationException ex)
-        {
-            var errors = ex.Errors
-                .GroupBy(e => e.PropertyName)
-                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
-            var details = new ValidationProblemDetails(errors)
-            {
-                Title = "Validation failed",
-                Status = StatusCodes.Status400BadRequest
-            };
-            return BadRequest(details);
-        }
+        var item = await _service.CreateAsync(request);
+        return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
     }
 
     [HttpGet("{id:int}")]

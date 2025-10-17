@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Todo.Domain.Entities;
@@ -5,6 +6,7 @@ using Todo.Infrastructure.Persistence;
 using Todo.Infrastructure.Persistence.Db;
 using Todo.Infrastructure.Repositories;
 using Todo.IntegrationTests.Fixtures;
+using Xunit;
 
 namespace Todo.IntegrationTests.Repository;
 
@@ -78,4 +80,3 @@ public class TaskRepositoryIntegrationTests : IClassFixture<PostgresContainerFix
         }
     }
 }
-

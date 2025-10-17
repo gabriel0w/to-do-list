@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Todo.Domain\Todo.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Todo.Application\Todo.Application.csproj" />
   </ItemGroup>
 
 </Project>
-
