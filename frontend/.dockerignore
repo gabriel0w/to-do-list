@@ -1,0 +1,9 @@
+node_modules/
+.angular/
+dist/
+.vscode/
+.idea/
+npm-debug.log
+.npmrc
+**/*.md
+

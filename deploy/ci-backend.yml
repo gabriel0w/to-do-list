@@ -7,6 +7,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
       - uses: actions/setup-dotnet@v4
         with: { dotnet-version: '8.0.x' }
       - name: Build
@@ -14,4 +21,6 @@ jobs:
         run: dotnet build --configuration Release
       - name: Test
         working-directory: backend
-        run: dotnet test --no-build --verbosity normal
+        run: |
+          docker --version || true
+          dotnet test --no-build --verbosity normal
