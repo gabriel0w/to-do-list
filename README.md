@@ -150,3 +150,19 @@ Commits: **Conventional Commits**.
 (Deploy/CD pode ser adicionado depois.)
 
 MIT © 2025
+### E2E (Playwright)
+- Pré‑requisitos: Node 20+, rede, backend rodando (`dotnet run --project to-do-list/backend/src/Todo.Api`).
+- Instalar dependências do E2E:
+```bash
+cd to-do-list/frontend
+npm install
+npx playwright install
+```
+- Rodar os testes:
+```bash
+npm run e2e
+```
+- Config usado: `frontend/e2e/playwright.config.ts` (sobe `ng serve` em `http://localhost:4200`).
+- Cenários cobertos:
+  - CRUD/toggle/reorder: `frontend/e2e/tests/tasks.e2e.spec.ts`
+  - Filtros (status/sort/direction): `frontend/e2e/tests/filters.e2e.spec.ts`

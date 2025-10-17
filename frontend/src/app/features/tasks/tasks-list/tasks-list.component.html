@@ -12,7 +12,7 @@
   <div class="filters" data-testid="filters">
     <mat-form-field appearance="fill">
       <mat-label>Status</mat-label>
-      <mat-select [(value)]="status" (selectionChange)="onFilterChange()">
+      <mat-select [(value)]="status" (selectionChange)="onFilterChange()" data-testid="status-select">
         <mat-option value="all">All</mat-option>
         <mat-option value="open">Open</mat-option>
         <mat-option value="done">Done</mat-option>
@@ -21,7 +21,7 @@
 
     <mat-form-field appearance="fill">
       <mat-label>Sort</mat-label>
-      <mat-select [(value)]="sort" (selectionChange)="onFilterChange()">
+      <mat-select [(value)]="sort" (selectionChange)="onFilterChange()" data-testid="sort-select">
         <mat-option value="orderIndex">Order</mat-option>
         <mat-option value="createdAt">Created</mat-option>
       </mat-select>
@@ -29,7 +29,7 @@
 
     <mat-form-field appearance="fill">
       <mat-label>Direction</mat-label>
-      <mat-select [(value)]="direction" (selectionChange)="onFilterChange()">
+      <mat-select [(value)]="direction" (selectionChange)="onFilterChange()" data-testid="direction-select">
         <mat-option value="asc">Asc</mat-option>
         <mat-option value="desc">Desc</mat-option>
       </mat-select>
