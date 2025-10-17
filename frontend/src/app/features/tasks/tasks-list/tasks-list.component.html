@@ -4,10 +4,10 @@
   <form (ngSubmit)="onCreate()" [formGroup]="form" class="create-form" data-testid="create-form">
     <mat-form-field appearance="outline" class="title-field">
       <mat-label>New task</mat-label>
-      <input matInput placeholder="Type task title" formControlName="title" [disabled]="creating" data-testid="title-input" />
-    </mat-form-field>
-    <button mat-raised-button color="primary" type="submit" [disabled]="creating || form.invalid" data-testid="add-btn">Add</button>
-  </form>
+      <input matInput placeholder="Type task title" formControlName="title" [maxlength]="200" [disabled]="creating" data-testid="title-input" />
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit" [disabled]="creating || form.invalid" data-testid="add-btn">Add</button>
+    </form>
 
   <div class="filters" data-testid="filters">
     <mat-form-field appearance="fill">
@@ -45,8 +45,7 @@
       <button mat-icon-button color="primary" (click)="toggle(t)" [attr.data-testid]="'toggle-' + t.id">
         <mat-icon>{{ t.isDone ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
       </button>
-      <span class="title" [class.done]="t.isDone">{{ t.title }}</span>
-      <span class="spacer"></span>
+      <span class="title" [class.done]="t.isDone" title="{{ t.title }}">{{ t.title }}</span>
       <button mat-icon-button color="warn" (click)="remove(t)" [attr.data-testid]="'delete-' + t.id"><mat-icon>delete</mat-icon></button>
       <button mat-icon-button cdkDragHandle [attr.data-testid]="'drag-' + t.id"><mat-icon>drag_indicator</mat-icon></button>
     </div>

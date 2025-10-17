@@ -1,9 +1,12 @@
 $ErrorActionPreference = 'Stop'
-Push-Location (Join-Path $PSScriptRoot '..' 'backend')
+$root = Split-Path -Parent $PSScriptRoot
+$backendPath = Join-Path $root 'backend'
+Push-Location $backendPath
 try {
   dotnet tool restore | Out-Null
   dotnet ef database update --project src/Todo.Infrastructure --startup-project src/Todo.Api
-} finally {
+}
+finally {
   Pop-Location
 }
 

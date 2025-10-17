@@ -1,9 +1,10 @@
 $ErrorActionPreference = 'Stop'
-$compose = Join-Path $PSScriptRoot '..' 'deploy' 'docker-compose.dev.yml'
-Write-Host "[compose-logs] Using: $compose"
 param(
   [string]$Service = ""
 )
+$root = Split-Path -Parent $PSScriptRoot
+$compose = Join-Path (Join-Path $root 'deploy') 'docker-compose.dev.yml'
+Write-Host "[compose-logs] Using: $compose"
 if ($Service) {
   docker compose -f $compose logs -f $Service
 } else {
